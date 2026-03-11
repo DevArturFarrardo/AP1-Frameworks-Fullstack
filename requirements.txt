@@ -3,3 +3,5 @@ flask_sqlalchemy
 mysql-connector-python
 werkzeug==2.0.2
 sqlalchemy==1.4.49
+requests>=2.28.0
+python-dotenv>=1.0.0
