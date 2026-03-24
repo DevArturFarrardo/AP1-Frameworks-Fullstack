@@ -1,5 +1,6 @@
 Flask==2.1.0
 flask_sqlalchemy
+flask-jwt-extended>=4.4.0
 mysql-connector-python
 werkzeug==2.0.2
 sqlalchemy==1.4.49

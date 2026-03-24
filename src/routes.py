@@ -24,4 +24,11 @@ def init_routes(app):
     def activate_seller():
         return SellerController.activate_seller()
 
+    # Autenticação do Seller (Flask-JWT-Extended)
+    @app.route("/api/sellers/login", methods=["POST"])
+    def login_seller():
+        return SellerController.login_seller()
 
+    @app.route("/api/sellers/refresh", methods=["POST"])
+    def refresh_token():
+        return SellerController.refresh_token()

@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
+from src.Application.Service.auth_service import AuthService
 from src.Application.Service.user_service import UserService
 from src.Domain.seller import SellerDomain
 from src.Infrastructure.Model.seller import Seller, STATUS_ATIVO, STATUS_INATIVO
@@ -87,3 +88,30 @@ class SellerService:
             seller.celular,
             seller.status,
         )
+
+    @staticmethod
+    def login(email, senha):
+        """
+        Autentica o seller por e-mail e senha.
+        Sellers com status Inativo são bloqueados.
+        Retorna o SellerDomain, access_token e refresh_token.
+        """
+        seller = Seller.query.filter_by(email=email).first()
+        if not seller or not check_password_hash(seller.password, senha):
+            raise ValueError("E-mail ou senha inválidos.")
+
+        if seller.status != STATUS_ATIVO:
+            raise ValueError("Conta inativa. Ative sua conta antes de fazer login.")
+
+        tokens = AuthService.generate_tokens(seller_id=seller.id)
+
+        seller_domain = SellerDomain(
+            seller.id,
+            seller.nome,
+            seller.cnpj,
+            seller.email,
+            seller.celular,
+            seller.status,
+        )
+
+        return seller_domain, tokens
