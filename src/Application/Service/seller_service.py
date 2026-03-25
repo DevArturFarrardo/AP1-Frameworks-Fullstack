@@ -17,8 +17,8 @@ class SellerService:
     def create_seller(nome, cnpj, email, celular, senha):
         """
         Cadastra um novo seller com status Inativo, gera código de 4 dígitos
-        e envia via WhatsApp (Twilio). Se Twilio não estiver configurado, o código
-        ainda é retornado na resposta para testes.
+        e envia via WhatsApp (Twilio).         Se Twilio não estiver configurado ou o envio falhar, o código
+        continua a ser retornado na resposta para testes.
         """
         if Seller.query.filter_by(email=email).first():
             raise ValueError("Já existe um seller cadastrado com este e-mail.")
@@ -42,7 +42,9 @@ class SellerService:
         db.session.commit()
 
         whatsapp = TwilioWhatsApp()
-        whatsapp.send_activation_code(to_phone=celular, code=activation_code)
+        codigo_enviado_whatsapp = whatsapp.send_activation_code(
+            to_phone=celular, code=activation_code
+        )
 
         return SellerDomain(
             seller.id,
@@ -51,7 +53,7 @@ class SellerService:
             seller.email,
             seller.celular,
             seller.status,
-        ), activation_code
+        ), activation_code, codigo_enviado_whatsapp
 
     @staticmethod
     def activate_seller(celular, codigo):

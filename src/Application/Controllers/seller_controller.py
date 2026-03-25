@@ -25,17 +25,25 @@ class SellerController:
             )
 
         try:
-            seller_domain, activation_code = SellerService.create_seller(
+            seller_domain, activation_code, whatsapp_ok = SellerService.create_seller(
                 nome=nome,
                 cnpj=cnpj,
                 email=email,
                 celular=celular,
                 senha=senha,
             )
+            if whatsapp_ok:
+                msg_extra = "Código de ativação enviado por WhatsApp (Twilio)."
+            else:
+                msg_extra = (
+                    "Não foi possível enviar o código por WhatsApp (verifique TWILIO_ACCOUNT_SID, "
+                    "TWILIO_AUTH_TOKEN e o template). Use o código abaixo para ativar a conta."
+                )
             response = {
-                "mensagem": "Seller cadastrado com sucesso. Use o código de ativação para ativar a conta (integração WhatsApp em breve).",
+                "mensagem": f"Seller cadastrado com sucesso. {msg_extra}",
                 "seller": seller_domain.to_dict(),
                 "codigo_ativacao": activation_code,
+                "codigo_enviado_whatsapp": whatsapp_ok,
             }
             return make_response(jsonify(response), 201)
         except ValueError as e:

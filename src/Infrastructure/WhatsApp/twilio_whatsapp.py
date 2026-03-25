@@ -57,22 +57,37 @@ class TwilioWhatsApp:
             self.from_whatsapp = f"whatsapp:{self.from_whatsapp}"
 
         url = TWILIO_MESSAGES_URL.format(account_sid=self.account_sid)
-        content_variables = json.dumps({"1": code})
-
-        payload = {
-            "To": to_phone,
-            "From": self.from_whatsapp,
-            "ContentSid": self.content_sid,
-            "ContentVariables": content_variables,
-        }
         auth = (self.account_sid, self.auth_token)
+
+        # Sandbox: o destinatário tem de enviar "join <codigo>" ao +1 415 523 8886 antes.
+        # Se o template (ContentSid) não bater com a conta ou com o WhatsApp aprovado, use
+        # TWILIO_SEND_CODE_WITH_BODY=true para enviar texto simples (útil no sandbox).
+        use_plain_body = os.environ.get("TWILIO_SEND_CODE_WITH_BODY", "").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
+        if use_plain_body:
+            payload = {
+                "To": to_phone,
+                "From": self.from_whatsapp,
+                "Body": f"Seu código de ativação: {code}",
+            }
+        else:
+            content_variables = json.dumps({"1": code})
+            payload = {
+                "To": to_phone,
+                "From": self.from_whatsapp,
+                "ContentSid": self.content_sid,
+                "ContentVariables": content_variables,
+            }
 
         try:
             logger.info(
-                "Twilio: enviando código para %s (From=%s, ContentSid=%s)",
+                "Twilio: enviando código para %s (From=%s, modo=%s)",
                 to_phone,
                 self.from_whatsapp,
-                self.content_sid,
+                "Body" if use_plain_body else f"ContentSid={self.content_sid}",
             )
             response = requests.post(
                 url,
@@ -81,7 +96,23 @@ class TwilioWhatsApp:
                 timeout=10,
             )
             if response.ok:
-                logger.info("WhatsApp (Twilio): código de ativação enviado para %s", to_phone)
+                try:
+                    data = response.json()
+                    sid = data.get("sid")
+                    status = data.get("status")
+                except Exception:
+                    sid, status = None, None
+                logger.info(
+                    "WhatsApp (Twilio): pedido aceite. sid=%s status=%s to=%s",
+                    sid,
+                    status,
+                    to_phone,
+                )
+                print(
+                    f"[WhatsApp] Twilio aceitou o envio. SID={sid} status={status}. "
+                    "Se não chegou: confira Monitor > Logs > Messaging no console Twilio "
+                    "e, no sandbox, se o número já enviou join <palavra> ao +14155238886."
+                )
                 return True
             # Resposta de erro do Twilio (útil para debug)
             try:
