@@ -1,3 +1,4 @@
+"""Serviço com as regras de negócio do seller (cadastro, ativação, login)."""
 from datetime import datetime, timedelta
 
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -13,6 +14,8 @@ CODE_VALID_MINUTES = 15
 
 
 class SellerService:
+    """Concentra as operações de negócio relativas ao seller."""
+
     @staticmethod
     def create_seller(nome, cnpj, email, celular, senha):
         """

@@ -1,5 +1,10 @@
-from src.config.data_base import db 
+"""Model SQLAlchemy do usuário genérico."""
+from src.config.data_base import db
+
+
 class User(db.Model):
+    """Tabela `users` com cadastro simples (nome, e-mail e senha)."""
+
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -7,6 +12,7 @@ class User(db.Model):
     password = db.Column(db.String(100), nullable=False)
 
     def to_dict(self):
+        """Retorna o usuário como dicionário (inclui a senha bruta)."""
         return {
             "id": self.id,
             "name": self.name,

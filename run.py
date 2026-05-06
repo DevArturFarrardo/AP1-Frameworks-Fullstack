@@ -1,10 +1,14 @@
+"""Ponto de entrada da aplicação Flask.
+
+Carrega as variáveis de ambiente do arquivo `.env` localizado na mesma
+pasta deste módulo e cria a aplicação chamando `create_app()`.
+"""
 import os
 from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Garante que .env seja carregado da pasta do projeto (onde fica run.py)
 _env_path = Path(__file__).resolve().parent / ".env"
 load_dotenv(dotenv_path=_env_path)
 
@@ -15,9 +19,15 @@ from src.routes import init_routes
 
 jwt = JWTManager()
 
+
 def create_app():
-    """
-    Função que cria e configura a aplicação Flask.
+    """Cria e configura a aplicação Flask.
+
+    - Define a chave secreta do JWT a partir da variável de ambiente
+      `JWT_SECRET_KEY` (com fallback para desenvolvimento).
+    - Define o tempo de expiração do access token (1 hora) e do refresh
+      token (30 dias).
+    - Inicializa o banco de dados e registra as rotas da API.
     """
     app = Flask(__name__)
 
@@ -32,6 +42,7 @@ def create_app():
     init_routes(app)
 
     return app
+
 
 app = create_app()
 

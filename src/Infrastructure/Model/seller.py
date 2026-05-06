@@ -1,3 +1,4 @@
+"""Model SQLAlchemy do seller (mini mercado) e constantes de status."""
 from src.config.data_base import db
 
 STATUS_INATIVO = "Inativo"
@@ -5,6 +6,8 @@ STATUS_ATIVO = "Ativo"
 
 
 class Seller(db.Model):
+    """Tabela `sellers` que armazena os dados de cadastro do mini mercado."""
+
     __tablename__ = "sellers"
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(200), nullable=False)
@@ -17,6 +20,7 @@ class Seller(db.Model):
     activation_code_expires_at = db.Column(db.DateTime, nullable=True)
 
     def to_dict(self):
+        """Retorna o seller como dicionário (sem expor a senha)."""
         return {
             "id": self.id,
             "nome": self.nome,

@@ -1,8 +1,8 @@
-Flask==2.1.0
-flask_sqlalchemy
-flask-jwt-extended>=4.4.0
-mysql-connector-python
-werkzeug==2.0.2
-sqlalchemy==1.4.49
-requests>=2.28.0
-python-dotenv>=1.0.0
+Flask>=3.0,<4.0
+Werkzeug>=3.0,<4.0
+flask_sqlalchemy>=3.1
+flask-jwt-extended>=4.6
+sqlalchemy>=2.0,<3.0
+mysql-connector-python>=9.0
+requests>=2.32
+python-dotenv>=1.0

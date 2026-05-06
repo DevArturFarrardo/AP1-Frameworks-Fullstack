@@ -1,3 +1,4 @@
+"""Controller HTTP responsável pelos endpoints de cadastro/login do seller."""
 from flask import request, jsonify, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -6,6 +7,8 @@ from src.Application.Service.seller_service import SellerService
 
 
 class SellerController:
+    """Agrupa os handlers HTTP relativos ao seller."""
+
     @staticmethod
     def create_seller():
         """POST /api/sellers - Cadastro de mini mercado (seller)."""
@@ -62,7 +65,6 @@ class SellerController:
                 400,
             )
 
-        # Aceita código como string de 4 dígitos
         codigo = str(codigo).strip()
         if len(codigo) != 4 or not codigo.isdigit():
             return make_response(
